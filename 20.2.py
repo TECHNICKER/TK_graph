@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog as fdg
+from tkinter import messagebox as msg
 from matplotlib import pyplot as plt
 
+data = [[],[]]
 
 window = tk.Tk()
 
@@ -19,32 +21,58 @@ point_marker = tk.StringVar()
 
 
 def otevri_soubor():
-    global data
-    data = [[],[]]
     path.set(fdg.askopenfilename())
+    load_file()
 
-    with open(path.get(), "r") as file: 
-        if path.get()[-4:] == ".txt":
-            for element in file:
-                data[0].append(float(element.strip().split()[0]))
-                data[1].append(float(element.strip().split()[1]))
+def load_file():
+    data[0].clear()
+    data[1].clear()
+    isx = True
+    flippy = 0
+    if len(path.get()) > 0:
+        with open(path.get(), "r") as file: 
+            if path.get()[-4:] == ".txt":
+                radky.config(state="disabled")
+                sloupce.config(state="disabled")
+                for element in file:
+                    data[0].append(float(element.strip().split()[0]))
+                    data[1].append(float(element.strip().split()[1]))
 
-        elif path.get()[-4:] == ".csv":
-            for element in file:
-                for pair in element.split(","):
-                    if len(pair.split(";")) == 2:
-                        data[0].append(float(pair.split(";")[0]))
-                        data[1].append(float(pair.split(";")[1]))
+            elif path.get()[-4:] == ".csv":
+                radky.config(state="normal")
+                sloupce.config(state="normal")
+                for element in file:
+                    for point in element.split(";"):
 
+                        if rows_x_cols.get() == 0:
+                            if isx == True:
+                                data[0].append(float(point))
+                                if "\n" in point:
+                                    isx = False
 
+                            elif isx == False:
+                                data[1].append(float(point))
+
+                        elif rows_x_cols.get() == 1:
+                            if flippy == 0:
+                                data[0].append(float(point))
+                                flippy = 1
+
+                            elif flippy == 1:
+                                data[1].append(float(point))
+                                flippy = 0
+                        
 def draw():
-    plt.plot(data[0], data[1], color=line_color.get(), linestyle = line_style.get(), marker=point_marker.get())
-    plt.xlabel(label_x.get())
-    plt.ylabel(label_y.get())
-    plt.title(title.get())
-    if grid_yes_no.get() == True:
-        plt.grid()
-    plt.show()
+    if len(data[0]) > 0 and len(data[1]) > 0:
+        plt.plot(data[0], data[1], color=line_color.get(), linestyle = line_style.get(), marker=point_marker.get())
+        plt.xlabel(label_x.get())
+        plt.ylabel(label_y.get())
+        plt.title(title.get())
+        if grid_yes_no.get() == True:
+            plt.grid()
+        plt.show()
+    else:
+        msg.showwarning("Error", "No data to draw.\nPlease load a compatible .txt or .csv file!")
 
 label = tk.Label(window, text="Tk_Graph")
 label.grid(row=0, column=0)
@@ -63,8 +91,8 @@ open_btn.grid(row=2, column=1)
 draw_btn = tk.Button(file_frame, text="draw", command=draw)
 draw_btn.grid(row=4, column=1)
 
-radky = tk.Radiobutton(file_frame, text="Data in rows", variable=rows_x_cols, value=0)
-sloupce = tk.Radiobutton(file_frame, text="Data in columns", variable=rows_x_cols, value=1)
+radky = tk.Radiobutton(file_frame, text="Data in rows", variable=rows_x_cols, value=0, command=load_file)
+sloupce = tk.Radiobutton(file_frame, text="Data in columns", variable=rows_x_cols, value=1, command=load_file)
 radky.grid(row=3, column=0, sticky="w")
 sloupce.grid(row=4, column=0, sticky="w")
 

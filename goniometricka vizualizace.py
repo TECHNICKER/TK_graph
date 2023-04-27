@@ -83,7 +83,7 @@ live.grid(row=1, column=2, sticky="E")
 sin_button = tk.Radiobutton(param_frame, text="sinus", variable=funkce, value=0, command=draw)
 sin_button.grid(row=0, column=0, sticky="W")
 
-cos_button = tk.Radiobutton(param_frame, text="cosinus       real time:", variable=funkce, value=1, command=draw)
+cos_button = tk.Radiobutton(param_frame, text="kosinus       real time:", variable=funkce, value=1, command=draw)
 cos_button.grid(row=1, column=0, sticky="W")
 
 tan_button = tk.Radiobutton(param_frame, text="tangens", variable=funkce, value=2, command=draw)
